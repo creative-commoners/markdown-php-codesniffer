@@ -7,20 +7,20 @@ use PHP_CodeSniffer\Ruleset;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use SilverStripe\MarkdownPhpCodeSniffer\Sniffer;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SnifferTest extends TestCase
 {
     /**
      * Validates that fenced code blocks are correctly identified and have the expected data
-     *
-     * @dataProvider provideFindFencedBlocks
      */
+    #[DataProvider('provideFindFencedBlocks')]
     public function testFindFencedCodeBlocks(
         string $path,
         bool $exists,
-        string $realPath = '',
-        int $num = 0,
-        string $content = ''
+        string $realPath,
+        int $num,
+        string $content,
     ) {
         if (!defined('PHP_CODESNIFFER_CBF')) {
             define('PHP_CODESNIFFER_CBF', false);
@@ -48,25 +48,34 @@ class SnifferTest extends TestCase
         }
     }
 
-    public function provideFindFencedBlocks()
+    public static function provideFindFencedBlocks()
     {
         return [
             'nothing to lint 1' => [
                 'path' => '/fixtures/nothing-to-lint.md',
                 'exists' => false,
+                'realPath' => '',
+                'num' => 0,
+                'content' => '',
             ],
             'nothing to lint 2' => [
                 'path' => '/fixtures/nothing-to-lint_1.md',
                 'exists' => false,
+                'realPath' => '',
+                'num' => 0,
+                'content' => '',
             ],
             'file paths all include block numbers' => [
                 'path' => '/fixtures/lint-but-no-problems.md',
                 'exists' => false,
+                'realPath' => '',
+                'num' => 0,
+                'content' => '',
             ],
             [
                 'path' => '/fixtures/lint-but-no-problems_1.md',
                 'exists' => true,
-                'realpath' => '/fixtures/lint-but-no-problems.md',
+                'realPath' => '/fixtures/lint-but-no-problems.md',
                 'num' => 1,
                 'content' => <<<'MD'
                 <?php
@@ -82,13 +91,16 @@ class SnifferTest extends TestCase
             'no hallucinated block' => [
                 'path' => '/fixtures/lint-but-no-problems_2.md',
                 'exists' => false,
+                'realPath' => '',
+                'num' => 0,
+                'content' => '',
             ],
             // No need to check lint-with-problems_1 and lint-with-problems_2 - they're functionality
             // identical to lint-but-no-problems_1 for the purposes of this test.
             'language identifier not case sensitive' => [
                 'path' => '/fixtures/lint-with-problems_3.md',
                 'exists' => true,
-                'realpath' => '/fixtures/lint-with-problems.md',
+                'realPath' => '/fixtures/lint-with-problems.md',
                 'num' => 3,
                 'content' => <<<'MD'
                 <?php
@@ -101,7 +113,7 @@ class SnifferTest extends TestCase
             'indentation not in content' => [
                 'path' => '/fixtures/lint-with-problems_4.md',
                 'exists' => true,
-                'realpath' => '/fixtures/lint-with-problems.md',
+                'realPath' => '/fixtures/lint-with-problems.md',
                 'num' => 4,
                 'content' => <<<'MD'
                 <?php
